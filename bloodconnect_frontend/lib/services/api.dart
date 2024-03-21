@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:bloodconnect_frontend/models/requesterdata_model.dart';
+import 'package:bloodconnect_frontend/profilescreen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -37,29 +38,34 @@ class Api {
       final res = await http.get(url);
 
       if (res.statusCode == 200) {
-        //
         var data = jsonDecode(res.body);
-        data['Requestersdata'].forEach(
-          (value) => {
-            Requestersdata.add(
-              RequesterData(
-                name: value['rname'],
-                bloodgroup: value['rbloodgroup'],
-                gender: value['rgender'],
-                address: value['raddress'],
-                phonenumber: value['rphonenumber'],
-                tag: value['rtag'],
-              ),
-            )
-          },
-        );
+        data.forEach((value) {
+          Requestersdata.add(RequesterData(
+            name: value['rname'],
+            bloodgroup: value['rbloodgroup'],
+            gender: value['rgender'],
+            address: value['raddress'],
+            phonenumber: value['rphonenumber'],
+            tag: value['rtag'],
+          ));
+        });
         return Requestersdata;
       } else {
         return [];
-        //
       }
     } catch (e) {
       print(e.toString());
+    }
+  }
+
+  static Future<List<RequesterData>> posterrequestdetails() async {
+    try {
+      // Call the method to fetch data from API
+      List<RequesterData> requestData = await getrequestersdata();
+      return requestData;
+    } catch (e) {
+      print("Error fetching data: $e");
+      throw e; // Rethrow the error for handling
     }
   }
 }

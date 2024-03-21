@@ -1,3 +1,4 @@
+import 'package:bloodconnect_frontend/profilescreen.dart';
 import 'package:bloodconnect_frontend/services/api.dart';
 import 'package:flutter/material.dart';
 
@@ -116,8 +117,7 @@ class _RequestFormState extends State<RequestForm> {
             ],
           ),
           ElevatedButton(
-            onPressed: () {
-              // Validate the form
+            onPressed: () async {
               if (_formKey.currentState?.validate() ?? false) {
                 if (_isChecked) {
                   // Handle request submission and poster posting
@@ -129,14 +129,23 @@ class _RequestFormState extends State<RequestForm> {
                     "rphonenumber": phonenumberController.text,
                     "rtag": tagController.text,
                   };
-                  // Post the pre-made poster
 
                   // Call API for request submission
                   Api.addrequesterdata(data);
 
                   // Post the pre-made poster
-
-                  // Handle posting of the pre-made poster
+                  await Api.posterrequestdetails().then((requestData) {
+                    // Navigate to profile screen with fetched data
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProfileScreen(data: requestData),
+                      ),
+                    );
+                  }).catchError((error) {
+                    // Handle error if any
+                    print("Error fetching data: $error");
+                  });
                 } else {
                   // Handle request submission only
                   var data = {
