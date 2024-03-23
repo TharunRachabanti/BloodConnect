@@ -37,9 +37,11 @@ class RegisterScreen extends StatelessWidget {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) =>
-                        TabScreen())); // Navigate to TabScreen using Navigator
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => TabScreen()),
+                );
+                // Navigate to TabScreen using Navigator
                 // Handle registration logic here
               },
               child: Text('Register'),

@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 
 const app = express();
-const Requesterdetails = require("./requesterdetails");
+const RequesterDetails = require("./requesterdetails");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -11,24 +11,34 @@ mongoose.connect("mongodb+srv://tharunrachabanti:tharun@cluster0.gxmq3cs.mongodb
   .then(() => {
     console.log('Connected to MongoDB');
 
+    // Endpoint to add requester data
     app.post("/api/add_requesterdata", async (req, res) => {
       console.log("Request Body:", req.body);
 
       try {
-        const newData = new Requesterdetails(req.body);
+        const { rname, rbloodgroup, rgender, raddress, rphonenumber, rtag, showInProfile } = req.body;
+
+        // Ensure showInProfile is properly handled as a boolean
+        const isShowInProfile = showInProfile === 'true' || showInProfile === true;
+
+        // Save the request data to the database
+        const newData = new RequesterDetails({ rname, rbloodgroup, rgender, raddress, rphonenumber, rtag, showInProfile: isShowInProfile });
         const savedData = await newData.save();
+
         res.status(200).json(savedData);
       } catch (error) {
         res.status(400).json({ status: error.message });
       }
     });
 
+    // Endpoint to get requested details
     app.get("/api/get_requesteddetails", async (req, res) => {
       try {
-        const data = await Requesterdetails.find();
+        // Fetch all data from the database
+        const data = await RequesterDetails.find();
         res.status(200).json(data);
+        
         console.log("Fetched Data:", data);
-        // Send data directly without wrapping it in any object
       } catch (error) {
         res.status(500).json({ status: error.message });
       }
@@ -42,3 +52,4 @@ mongoose.connect("mongodb+srv://tharunrachabanti:tharun@cluster0.gxmq3cs.mongodb
   .catch((error) => {
     console.error('Error connecting to MongoDB', error);
   });
+

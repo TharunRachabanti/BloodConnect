@@ -1,31 +1,34 @@
 const mongoose = require("mongoose");
 
 let dataSchema = new mongoose.Schema({
-    'rname': {
+    rname: {
         required: true,
         type: String
     },
-    'rbloodgroup': {
+    rbloodgroup: {
         required: true,
         type: String
     },
-    'rgender': {
+    rgender: {
         required: true,
         type: String
     },
-    'raddress': {
+    raddress: {
         required: true,
         type: String
     },
-    'rphonenumber': {
+    rphonenumber: {
         required: true,
         type: String
     },
-    'rtag': {
+    rtag: {
         required: true,
         type: String
     },
-
+    showInProfile: {
+        type: Boolean,
+        default: false // Default value if not provided
+    }
 });
 
 module.exports = mongoose.model("requestersdetails", dataSchema);

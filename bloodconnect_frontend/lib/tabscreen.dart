@@ -1,13 +1,10 @@
 import 'package:bloodconnect_frontend/RequestScreens/requestscreen.dart';
 import 'package:bloodconnect_frontend/DonateScreens/donatescreen.dart';
 import 'package:bloodconnect_frontend/homescreen.dart';
-import 'package:bloodconnect_frontend/models/requesterdata_model.dart';
 import 'package:bloodconnect_frontend/profilescreen.dart';
 import 'package:flutter/material.dart';
 
 class TabScreen extends StatefulWidget {
-  const TabScreen({Key? key}) : super(key: key);
-
   @override
   _TabScreenState createState() => _TabScreenState();
 }
@@ -15,27 +12,17 @@ class TabScreen extends StatefulWidget {
 class _TabScreenState extends State<TabScreen> {
   int _selectedIndex = 0;
 
-  // Define the data list for the ProfileScreen
-  List<RequesterData> profileData = [];
-
   late List<Widget> _widgetOptions;
 
   @override
   void initState() {
     super.initState();
-    // Initialize _widgetOptions inside initState
     _widgetOptions = <Widget>[
       HomeScreen(),
       DonateScreen(),
       RequestScreen(),
-      ProfileScreen(data: profileData),
+      ProfileScreen(), // No parameters passed
     ];
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
   }
 
   @override
@@ -80,5 +67,11 @@ class _TabScreenState extends State<TabScreen> {
         onTap: _onItemTapped,
       ),
     );
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 }

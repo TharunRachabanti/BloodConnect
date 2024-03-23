@@ -5,17 +5,24 @@ import 'package:flutter/material.dart';
 class RequestScreen2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text('Request/Poster Form Screen'),
-            Text(
-                'In this screen, if the user submits the form without selecting the checkbox, the requested details will appear in the "Blood Seekers" section of the "Donate" screen. However, if the user selects the checkbox, an additional pre-made poster will be generated using the provided details. This poster will then be posted on the homepage for wider visibility.'),
-            SizedBox(height: 20),
-            RequestForm(),
-          ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Request/Poster Form Screen'),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                'In this screen, if the user submits the form without selecting the checkbox, the requested details will appear in the "Blood Seekers" section of the "Donate" screen. However, if the user selects the checkbox, an additional pre-made poster will be generated using the provided details. This poster will then be posted on the homepage for wider visibility.',
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20),
+              RequestForm(),
+            ],
+          ),
         ),
       ),
     );
@@ -30,12 +37,12 @@ class RequestForm extends StatefulWidget {
 class _RequestFormState extends State<RequestForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isChecked = false;
-  var nameController = TextEditingController();
-  var bloodgroupController = TextEditingController();
-  var genderController = TextEditingController();
-  var addressController = TextEditingController();
-  var phonenumberController = TextEditingController();
-  var tagController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController bloodgroupController = TextEditingController();
+  TextEditingController genderController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
+  TextEditingController phonenumberController = TextEditingController();
+  TextEditingController tagController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -113,52 +120,23 @@ class _RequestFormState extends State<RequestForm> {
                   });
                 },
               ),
-              Text('Post Poster '),
+              Text('Show in Profile'),
             ],
           ),
           ElevatedButton(
             onPressed: () async {
               if (_formKey.currentState?.validate() ?? false) {
-                if (_isChecked) {
-                  // Handle request submission and poster posting
-                  var data = {
-                    "rname": nameController.text,
-                    "rbloodgroup": bloodgroupController.text,
-                    "rgender": genderController.text,
-                    "raddress": addressController.text,
-                    "rphonenumber": phonenumberController.text,
-                    "rtag": tagController.text,
-                  };
+                var data = {
+                  "rname": nameController.text,
+                  "rbloodgroup": bloodgroupController.text,
+                  "rgender": genderController.text,
+                  "raddress": addressController.text,
+                  "rphonenumber": phonenumberController.text,
+                  "rtag": tagController.text,
+                };
 
-                  // Call API for request submission
-                  Api.addrequesterdata(data);
-
-                  // Post the pre-made poster
-                  await Api.posterrequestdetails().then((requestData) {
-                    // Navigate to profile screen with fetched data
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ProfileScreen(data: requestData),
-                      ),
-                    );
-                  }).catchError((error) {
-                    // Handle error if any
-                    print("Error fetching data: $error");
-                  });
-                } else {
-                  // Handle request submission only
-                  var data = {
-                    "rname": nameController.text,
-                    "rbloodgroup": bloodgroupController.text,
-                    "rgender": genderController.text,
-                    "raddress": addressController.text,
-                    "rphonenumber": phonenumberController.text,
-                    "rtag": tagController.text,
-                  };
-                  // Call API for request submission
-                  Api.addrequesterdata(data);
-                }
+                // Pass _isChecked as a boolean to the API call
+                Api.addrequesterdata(data, _isChecked);
               }
             },
             child: Text('Submit'),

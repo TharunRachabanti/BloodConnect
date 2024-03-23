@@ -1,4 +1,6 @@
 import 'package:bloodconnect_frontend/LoginScreens/welcomescreen.dart';
+import 'package:bloodconnect_frontend/homescreen.dart';
+import 'package:bloodconnect_frontend/tabscreen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -11,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: WelcomeScreen(),
+      home: TabScreen(),
     );
   }
 }
