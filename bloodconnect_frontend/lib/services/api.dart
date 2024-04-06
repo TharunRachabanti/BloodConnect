@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class Api {
-  static const baseUrl = "http://192.168.40.33:3000/api/";
+  static const baseUrl = "http://192.168.0.137/api/";
 
   static Future<void> addrequesterdata(
       Map<String, dynamic> rdata, bool showInProfile) async {
@@ -28,7 +28,6 @@ class Api {
     }
   }
 
-  //get method
   static Future<List<RequesterData>> getrequestersdata() async {
     List<RequesterData> requestersData = [];
 
@@ -58,6 +57,27 @@ class Api {
     } catch (e) {
       print(e.toString());
       return []; // Return empty list in case of error
+    }
+  }
+
+  static Future<void> uploadImageData(String imageUrl, String message) async {
+    var url = Uri.parse("${baseUrl}store_image_message");
+
+    try {
+      final res = await http.post(url, body: {
+        "imageUrl": imageUrl,
+        "message": message,
+      });
+
+      if (res.statusCode == 200) {
+        var responseData = jsonDecode(res.body);
+        print("Image data uploaded successfully");
+      } else {
+        print("Failed to upload image data. Status code: ${res.statusCode}");
+        print("Response body: ${res.body}");
+      }
+    } catch (e) {
+      print("Error uploading image data: $e");
     }
   }
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "489277171730",
+    "project_id": "bloodconnect-frontend",
+    "storage_bucket": "bloodconnect-frontend.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:489277171730:android:61b81d0a1196f7046e50cb",
+        "android_client_info": {
+          "package_name": "com.example.bloodconnect_frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGyEvIfPdJChgJ9VBP7_zI-ROon0dtpX0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -3,6 +3,11 @@ import 'package:bloodconnect_frontend/models/requesterdata_model.dart';
 import 'package:bloodconnect_frontend/services/api.dart';
 import 'package:flutter/material.dart';
 
+class OtherBloodGroupsScreen extends StatefulWidget {
+  @override
+  _OtherBloodGroupsScreenState createState() => _OtherBloodGroupsScreenState();
+}
+
 class _OtherBloodGroupsScreenState extends State<OtherBloodGroupsScreen> {
   String? _selectedBloodGroup;
   String? _selectedLocation;

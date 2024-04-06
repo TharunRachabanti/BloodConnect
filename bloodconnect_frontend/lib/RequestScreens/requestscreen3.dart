@@ -1,50 +1,132 @@
+import 'dart:io';
+import 'package:bloodconnect_frontend/services/api.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
 
-class RequestScreen3 extends StatelessWidget {
+class RequestScreen3 extends StatefulWidget {
+  @override
+  _RequestScreen3State createState() => _RequestScreen3State();
+}
+
+class _RequestScreen3State extends State<RequestScreen3> {
+  final _formKey = GlobalKey<FormState>();
+  TextEditingController _messageController = TextEditingController();
+  File? _image;
+  bool _isLoading = false;
+  String imageUrl = '';
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text('Tweet Screen'),
-            Text(
-                'In this screen, users can express the urgency of a patients need for blood by typing their message. They can also attach related images of the patient. Once they harve conveyed the urgency effectively, they simply click Submit. This tweet will then be prominently displayed on the home screen, ensuring maximum visibility and potential assistance for the patient.'),
-            // Tweet Input
-            Padding(
-              padding: EdgeInsets.all(20.0),
-              child: TextFormField(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Create Tweet'),
+      ),
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              TextFormField(
+                controller: _messageController,
+                maxLines: 5,
                 decoration: InputDecoration(
-                  hintText: 'Enter your tweet...',
+                  labelText: 'Message',
                   border: OutlineInputBorder(),
                 ),
-                maxLines: null, // Allows multiline input
-              ),
-            ),
-            // Image Input from Device Storage
-            Padding(
-              padding: EdgeInsets.all(20.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  // Implement image selection from device storage
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your message';
+                  }
+                  return null;
                 },
-                child: Text('Select Image'),
               ),
-            ),
-            // Submit Option
-            Padding(
-              padding: EdgeInsets.all(20.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  // Implement tweet submission logic
-                },
-                child: Text('Submit'),
-              ),
-            ),
-          ],
+              SizedBox(height: 20),
+              _image != null
+                  ? Image.file(
+                      _image!,
+                      height: 150,
+                    )
+                  : SizedBox(),
+              SizedBox(height: 20),
+              _isLoading
+                  ? CircularProgressIndicator() // Show loading indicator if uploading
+                  : ElevatedButton(
+                      onPressed: () async {
+                        // Call _uploadImageAndMessage function
+                        await _uploadImageAndMessage();
+
+                        // If _uploadImageAndMessage was successful, call Api.uploadImageData
+                        if (!_isLoading) {
+                          Api.uploadImageData(
+                              imageUrl, _messageController.text);
+                        }
+                      },
+                      child: Text('Submit'),
+                    ),
+            ],
+          ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _getImage,
+        tooltip: 'Select Image',
+        child: Icon(Icons.add_a_photo),
+      ),
     );
+  }
+
+  Future<void> _getImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> _uploadImageAndMessage() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        // Get message text
+        final String message = _messageController.text;
+
+        // Upload image to Firebase Storage
+
+        if (_image != null) {
+          final Reference storageRef = FirebaseStorage.instance
+              .ref()
+              .child('images/${DateTime.now().millisecondsSinceEpoch}');
+          final UploadTask uploadTask = storageRef.putFile(_image!);
+          final TaskSnapshot taskSnapshot = await uploadTask;
+          imageUrl = await taskSnapshot.ref.getDownloadURL();
+        }
+
+        // Now you can use imageUrl and message for further processing
+        // For example, you can send them to your backend or use them directly in your app
+        print('Image URL: $imageUrl');
+        print('Message: $message');
+
+        setState(() {
+          _isLoading = false;
+        });
+
+        // Optionally, you can navigate to another screen or show a success message here
+      } catch (e) {
+        print('Error uploading image: $e');
+        setState(() {
+          _isLoading = false;
+        });
+        // Handle error gracefully, show a snackbar, alert dialog, or retry option
+      }
+    }
   }
 }
