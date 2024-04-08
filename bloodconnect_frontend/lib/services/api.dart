@@ -1,11 +1,12 @@
 import 'dart:convert';
 
 import 'package:bloodconnect_frontend/models/requesterdata_model.dart';
+import 'package:bloodconnect_frontend/models/tweetimagemodel.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class Api {
-  static const baseUrl = "http://192.168.0.137/api/";
+  static const baseUrl = "https://bloodconnect-server.onrender.com/api/";
 
   static Future<void> addrequesterdata(
       Map<String, dynamic> rdata, bool showInProfile) async {
@@ -61,7 +62,8 @@ class Api {
   }
 
   static Future<void> uploadImageData(String imageUrl, String message) async {
-    var url = Uri.parse("${baseUrl}store_image_message");
+    var url =
+        Uri.parse("${baseUrl}store_image_message"); // Update the endpoint URL
 
     try {
       final res = await http.post(url, body: {
@@ -69,6 +71,7 @@ class Api {
         "message": message,
       });
 
+      // Handle response based on status code
       if (res.statusCode == 200) {
         var responseData = jsonDecode(res.body);
         print("Image data uploaded successfully");
@@ -78,6 +81,32 @@ class Api {
       }
     } catch (e) {
       print("Error uploading image data: $e");
+    }
+  }
+
+  static Future<List<TweetImageModel>> getImageMessages() async {
+    List<TweetImageModel> imageMessages = [];
+
+    var url = Uri.parse("${baseUrl}get_image_message");
+
+    try {
+      final res = await http.get(url);
+
+      if (res.statusCode == 200) {
+        var data = jsonDecode(res.body);
+        data.forEach((value) {
+          imageMessages.add(TweetImageModel(
+            Imageurl: value['imageUrl'],
+            Message: value['message'],
+          ));
+        });
+        return imageMessages;
+      } else {
+        return []; // Return empty list if status code is not 200
+      }
+    } catch (e) {
+      print(e.toString());
+      return []; // Return empty list in case of error
     }
   }
 }

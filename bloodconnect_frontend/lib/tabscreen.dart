@@ -1,6 +1,8 @@
+import 'package:bloodconnect_frontend/MainProfileScreen.dart';
 import 'package:bloodconnect_frontend/RequestScreens/requestscreen.dart';
 import 'package:bloodconnect_frontend/DonateScreens/donatescreen.dart';
 import 'package:bloodconnect_frontend/homescreen.dart';
+import 'package:bloodconnect_frontend/mainhome.dart';
 import 'package:bloodconnect_frontend/profilescreen.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +23,9 @@ class _TabScreenState extends State<TabScreen> {
       HomeScreen(),
       DonateScreen(),
       RequestScreen(),
-      ProfileScreen(), // No parameters passed
+      ProfileScreen(),
+      MainProfileScreen(),
+      MainHomeScreen(), // No parameters passed
     ];
   }
 
@@ -60,6 +64,20 @@ class _TabScreenState extends State<TabScreen> {
               color: Colors.black,
             ),
             label: 'Profile',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.ac_unit_sharp,
+              color: Colors.black,
+            ),
+            label: 'MProfile',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.home,
+              color: Colors.black,
+            ),
+            label: 'Home',
           ),
         ],
         currentIndex: _selectedIndex,

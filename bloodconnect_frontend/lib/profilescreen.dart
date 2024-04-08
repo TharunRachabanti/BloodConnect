@@ -1,4 +1,5 @@
 import 'package:bloodconnect_frontend/models/requesterdata_model.dart';
+import 'package:bloodconnect_frontend/models/tweetimagemodel.dart';
 import 'package:bloodconnect_frontend/services/api.dart';
 import 'package:flutter/material.dart';
 
@@ -10,36 +11,32 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(),
       body: FutureBuilder(
-        future: Api.getrequestersdata(),
+        future: Api.getImageMessages(),
         builder: (BuildContext context,
-            AsyncSnapshot<List<RequesterData>> snapshot) {
+            AsyncSnapshot<List<TweetImageModel>> snapshot) {
           if (!snapshot.hasData) {
             return Center(
               child: CircularProgressIndicator(),
             );
           } else {
-            List<RequesterData> rdata = snapshot.data!
-                .where((data) => data.showInProfile == true)
-                .toList();
-
+            List<TweetImageModel> data = snapshot.data!.toList();
             return ListView.builder(
-              itemCount: rdata.length,
+              itemCount: data.length,
               itemBuilder: (BuildContext context, int index) {
-                RequesterData requesterData = rdata[index];
+                TweetImageModel tweetImageModeldata = data[index];
                 return Card(
                   child: ListTile(
-                    title: Text(requesterData.name ?? ''),
+                    title: Text(tweetImageModeldata.Message ?? ''),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Blood Group: ${requesterData.bloodgroup ?? ''}'),
-                        Text('Gender: ${requesterData.gender ?? ''}'),
-                        Text('Address: ${requesterData.address ?? ''}'),
-                        Text(
-                            'Phone Number: ${requesterData.phonenumber ?? ''}'),
-                        Text('Tag: ${requesterData.tag ?? ''}'),
-                        Text(
-                            'Show in Profile: ${requesterData.showInProfile ?? ''}'),
+                        Text('message: ${tweetImageModeldata.Message ?? ''}'),
+                        Image.network(
+                          tweetImageModeldata.Imageurl ?? '',
+                          width: 200, // Adjust the width as needed
+                          height: 200, // Adjust the height as needed
+                          fit: BoxFit.cover, // Adjust the fit as needed
+                        ),
                       ],
                     ),
                   ),

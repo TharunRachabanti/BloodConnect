@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
 
-let messageImageSchema = new mongoose.Schema({
-  imageUrl: {
-    required: true,
-    type: String
-  },
-  message: {
-    required: true,
-    type: String
-  }
+let dataSchema = new mongoose.Schema({
+    imageUrl: {
+        required: true,
+        type: String
+    },
+    message: {
+        required: true,
+        type: String
+    }
 });
 
-module.exports = mongoose.model("messageimages", messageImageSchema);
+module.exports = mongoose.model("messageimages", dataSchema); // Use a meaningful collection name

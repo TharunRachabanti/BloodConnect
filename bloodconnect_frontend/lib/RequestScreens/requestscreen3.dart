@@ -100,18 +100,25 @@ class _RequestScreen3State extends State<RequestScreen3> {
         final String message = _messageController.text;
 
         // Upload image to Firebase Storage
-
         if (_image != null) {
           final Reference storageRef = FirebaseStorage.instance
               .ref()
               .child('images/${DateTime.now().millisecondsSinceEpoch}');
+
           final UploadTask uploadTask = storageRef.putFile(_image!);
+
+          // Show upload progress using a progress indicator
+          uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+            double progress = snapshot.bytesTransferred / snapshot.totalBytes;
+            print('Upload progress: $progress');
+          });
+
+          // Wait for the upload to complete
           final TaskSnapshot taskSnapshot = await uploadTask;
           imageUrl = await taskSnapshot.ref.getDownloadURL();
         }
 
         // Now you can use imageUrl and message for further processing
-        // For example, you can send them to your backend or use them directly in your app
         print('Image URL: $imageUrl');
         print('Message: $message');
 
@@ -125,7 +132,15 @@ class _RequestScreen3State extends State<RequestScreen3> {
         setState(() {
           _isLoading = false;
         });
-        // Handle error gracefully, show a snackbar, alert dialog, or retry option
+
+        // Handle error gracefully, show a snackbar or alert dialog
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error uploading image. Please try again later.'),
+          action: SnackBarAction(
+            label: 'Retry',
+            onPressed: _uploadImageAndMessage, // Retry the upload
+          ),
+        ));
       }
     }
   }

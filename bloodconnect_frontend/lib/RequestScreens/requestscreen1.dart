@@ -1,34 +1,85 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class RequestScreen1 extends StatelessWidget {
+class RequestScreen1 extends StatefulWidget {
+  @override
+  _RequestScreen1State createState() => _RequestScreen1State();
+}
+
+class _RequestScreen1State extends State<RequestScreen1> {
+  String bloodGroupFilter = '';
+  String locationFilter = '';
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text('Blood Donors Screen'),
-            Text(
-                "This section displays all users who have registered with the same blood group as the current user. Additionally, a filter option is provided below to allow users to view individuals from all blood groups."),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                _showFilterDialog(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Blood Donors'),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              _showFilterDialog(context);
+            },
+            child: Text('Filter'),
+          ),
+          Expanded(
+            child: StreamBuilder(
+              stream: _getFilteredUsersStream(),
+              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                }
+
+                return ListView(
+                  children:
+                      snapshot.data!.docs.map((DocumentSnapshot document) {
+                    Map<String, dynamic> data =
+                        document.data() as Map<String, dynamic>;
+                    return ListTile(
+                      title: Text(data['name']),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Age: ${data['age']}'),
+                          Text('Blood Group: ${data['bloodGroup']}'),
+                          Text('Address: ${data['address']}'),
+                          Text('Sex: ${data['sex']}'),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                );
               },
-              child: Text('Filter'),
             ),
-            // Add your content here for Blood Donors screen
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  void _showFilterDialog(BuildContext context) {
-    String bloodGroup = '';
-    String location = '';
+  Stream<QuerySnapshot> _getFilteredUsersStream() {
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    Query query = users;
 
+    if (bloodGroupFilter.isNotEmpty) {
+      query = query.where('bloodGroup', isEqualTo: bloodGroupFilter);
+    }
+
+    if (locationFilter.isNotEmpty) {
+      query = query.where('address', isEqualTo: locationFilter);
+    }
+
+    return query.snapshots();
+  }
+
+  void _showFilterDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -40,13 +91,17 @@ class RequestScreen1 extends StatelessWidget {
               TextField(
                 decoration: InputDecoration(labelText: 'Blood Group'),
                 onChanged: (value) {
-                  bloodGroup = value;
+                  setState(() {
+                    bloodGroupFilter = value;
+                  });
                 },
               ),
               TextField(
                 decoration: InputDecoration(labelText: 'Location'),
                 onChanged: (value) {
-                  location = value;
+                  setState(() {
+                    locationFilter = value;
+                  });
                 },
               ),
             ],
@@ -60,8 +115,6 @@ class RequestScreen1 extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                // Perform filtering based on bloodGroup and location
-                // You can pass these values to another function or handle filtering logic here
                 Navigator.of(context).pop();
               },
               child: Text('Search'),
