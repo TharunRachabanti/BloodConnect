@@ -109,4 +109,23 @@ class Api {
       return []; // Return empty list in case of error
     }
   }
+
+  // Modify this method to fetch combined data
+  static Future<List<dynamic>> getCombinedData() async {
+    List<dynamic> combinedData = [];
+
+    // Fetch data from collection 1
+    List<RequesterData> requesterData = await Api.getrequestersdata();
+
+    // Fetch data from collection 2
+    List<TweetImageModel> tweetImageModelData = await Api.getImageMessages();
+
+    // Merge and sort data based on update time
+    combinedData.addAll(requesterData);
+    combinedData.addAll(tweetImageModelData);
+    combinedData.sort((a, b) =>
+        (b.updatedAt ?? DateTime(0)).compareTo(a.updatedAt ?? DateTime(0)));
+
+    return combinedData;
+  }
 }

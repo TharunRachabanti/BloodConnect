@@ -1,107 +1,72 @@
+import 'package:bloodconnect_frontend/services/api.dart';
 import 'package:flutter/material.dart';
 import 'package:bloodconnect_frontend/models/requesterdata_model.dart';
 import 'package:bloodconnect_frontend/models/tweetimagemodel.dart';
-import 'package:bloodconnect_frontend/services/api.dart';
 
-class MainHomeScreen extends StatefulWidget {
-  const MainHomeScreen({Key? key}) : super(key: key);
-
-  @override
-  State<MainHomeScreen> createState() => _MainHomeScreenState();
-}
-
-class _MainHomeScreenState extends State<MainHomeScreen> {
-  late Future<List<dynamic>> _futureData;
-
-  @override
-  void initState() {
-    super.initState();
-    _futureData =
-        Future.wait([Api.getrequestersdata(), Api.getImageMessages()]);
-  }
+class MainHomeScreen extends StatelessWidget {
+  const MainHomeScreen({Key? key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: FutureBuilder<List<dynamic>>(
-        future: _futureData,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+      body: FutureBuilder(
+        future: Future.wait([
+          Api.getrequestersdata(),
+          Api.getImageMessages(),
+        ]),
+        builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+          if (!snapshot.hasData) {
             return Center(
               child: CircularProgressIndicator(),
             );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error fetching data'),
-            );
           } else {
-            final List<dynamic> data = snapshot.data!;
+            List<RequesterData> requesterDataList =
+                snapshot.data![0].cast<RequesterData>();
+            List<TweetImageModel> imageMessagesList =
+                snapshot.data![1].cast<TweetImageModel>();
+
+            // Combine both lists into a single list
+            List<dynamic> combinedList = [
+              ...requesterDataList,
+              ...imageMessagesList
+            ];
+
+            // Sort the combined list based on timestamp (assuming timestamp field exists)
+            combinedList.sort((a, b) {
+              // Assuming a.timestamp and b.timestamp are DateTime objects
+              return b.timestamp.compareTo(a.timestamp); // Descending order
+            });
+
             return ListView.builder(
-              itemCount: data.length,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  List<RequesterData> rdata =
-                      (data[index] as List<RequesterData>)
-                          .where((data) => data.showInProfile == true)
-                          .toList();
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: rdata.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      RequesterData requesterData = rdata[index];
-                      return Card(
-                        child: ListTile(
-                          title: Text(requesterData.name ?? ''),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                  'Blood Group: ${requesterData.bloodgroup ?? ''}'),
-                              Text('Gender: ${requesterData.gender ?? ''}'),
-                              Text('Address: ${requesterData.address ?? ''}'),
-                              Text(
-                                  'Phone Number: ${requesterData.phonenumber ?? ''}'),
-                              Text('Tag: ${requesterData.tag ?? ''}'),
-                              Text(
-                                  'Show in Profile: ${requesterData.showInProfile ?? ''}'),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
+              itemCount: combinedList.length,
+              itemBuilder: (BuildContext context, int index) {
+                dynamic item = combinedList[index];
+
+                if (item is RequesterData) {
+                  // Handle RequesterData item
+                  return Card(
+                    child: ListTile(
+                      title: Text(item.name ?? ''),
+                      subtitle: Text('Blood Group: ${item.bloodgroup ?? ''}'),
+                      // Add more fields as needed
+                    ),
+                  );
+                } else if (item is TweetImageModel) {
+                  // Handle TweetImageModel item
+                  return Card(
+                    child: ListTile(
+                      title: Text(item.Message ?? ''),
+                      subtitle: Image.network(
+                        item.Imageurl ?? '',
+                        width: 200,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   );
                 } else {
-                  List<TweetImageModel> tweetImageModels =
-                      (data[index] as List<TweetImageModel>);
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: tweetImageModels.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      TweetImageModel tweetImageModeldata =
-                          tweetImageModels[index];
-                      return Card(
-                        child: ListTile(
-                          title: Text(tweetImageModeldata.Message ?? ''),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                  'message: ${tweetImageModeldata.Message ?? ''}'),
-                              Image.network(
-                                tweetImageModeldata.Imageurl ?? '',
-                                width: 200, // Adjust the width as needed
-                                height: 200, // Adjust the height as needed
-                                fit: BoxFit.cover, // Adjust the fit as needed
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  );
+                  return SizedBox(); // Handle other types of data if any
                 }
               },
             );
