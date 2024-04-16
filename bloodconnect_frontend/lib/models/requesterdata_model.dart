@@ -5,7 +5,9 @@ class RequesterData {
   final String? address;
   final String? phonenumber;
   final String? tag;
-  final bool? showInProfile; // New field
+  final bool? showInProfile;
+  final DateTime? createdAt;
+  final String? username; // Include the username field
 
   RequesterData({
     this.name,
@@ -14,6 +16,8 @@ class RequesterData {
     this.address,
     this.phonenumber,
     this.tag,
-    this.showInProfile, // Include showInProfile in the constructor
+    this.showInProfile,
+    this.createdAt,
+    this.username, // Add the username parameter to the constructor
   });
 }

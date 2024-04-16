@@ -8,7 +8,15 @@ let dataSchema = new mongoose.Schema({
     message: {
         required: true,
         type: String
+    },
+    username: {
+        required: true,
+        type: String
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now // Set default value to current timestamp
     }
 });
 
-module.exports = mongoose.model("messageimages", dataSchema); // Use a meaningful collection name
+module.exports = mongoose.model("messageimages", dataSchema);

@@ -1,28 +1,30 @@
-import 'package:bloodconnect_frontend/profilescreen.dart';
-import 'package:bloodconnect_frontend/services/api.dart';
 import 'package:flutter/material.dart';
+import 'package:bloodconnect_frontend/TestScreens/requesttweetscreen.dart';
+import 'package:bloodconnect_frontend/services/api.dart';
+import 'package:bloodconnect_frontend/services/currentuser.dart';
 
 class RequestScreen2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Request/Poster Form Screen'),
-      ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                'In this screen, if the user submits the form without selecting the checkbox, the requested details will appear in the "Blood Seekers" section of the "Donate" screen. However, if the user selects the checkbox, an additional pre-made poster will be generated using the provided details. This poster will then be posted on the homepage for wider visibility.',
+        padding: EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              child: Text(
+                'Submit your request to seek blood donation.',
                 textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              SizedBox(height: 20),
-              RequestForm(),
-            ],
-          ),
+            ),
+            RequestForm(),
+          ],
         ),
       ),
     );
@@ -43,16 +45,31 @@ class _RequestFormState extends State<RequestForm> {
   TextEditingController addressController = TextEditingController();
   TextEditingController phonenumberController = TextEditingController();
   TextEditingController tagController = TextEditingController();
+  late String _currentUserName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCurrentUserName();
+  }
+
+  void _fetchCurrentUserName() async {
+    _currentUserName = await getCurrentUserNameFromFirestore();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           TextFormField(
             controller: nameController,
-            decoration: InputDecoration(labelText: 'Name'),
+            decoration: InputDecoration(
+              labelText: 'Name',
+              border: OutlineInputBorder(),
+            ),
             validator: (value) {
               if (value?.isEmpty ?? true) {
                 return 'Please enter your name';
@@ -60,9 +77,13 @@ class _RequestFormState extends State<RequestForm> {
               return null;
             },
           ),
+          SizedBox(height: 10),
           TextFormField(
             controller: bloodgroupController,
-            decoration: InputDecoration(labelText: 'Blood Group'),
+            decoration: InputDecoration(
+              labelText: 'Blood Group',
+              border: OutlineInputBorder(),
+            ),
             validator: (value) {
               if (value?.isEmpty ?? true) {
                 return 'Please enter your blood group';
@@ -70,9 +91,13 @@ class _RequestFormState extends State<RequestForm> {
               return null;
             },
           ),
+          SizedBox(height: 10),
           TextFormField(
             controller: genderController,
-            decoration: InputDecoration(labelText: 'Gender'),
+            decoration: InputDecoration(
+              labelText: 'Gender',
+              border: OutlineInputBorder(),
+            ),
             validator: (value) {
               if (value?.isEmpty ?? true) {
                 return 'Please enter your gender';
@@ -80,9 +105,13 @@ class _RequestFormState extends State<RequestForm> {
               return null;
             },
           ),
+          SizedBox(height: 10),
           TextFormField(
             controller: addressController,
-            decoration: InputDecoration(labelText: 'Address'),
+            decoration: InputDecoration(
+              labelText: 'Address',
+              border: OutlineInputBorder(),
+            ),
             validator: (value) {
               if (value?.isEmpty ?? true) {
                 return 'Please enter your address';
@@ -90,9 +119,13 @@ class _RequestFormState extends State<RequestForm> {
               return null;
             },
           ),
+          SizedBox(height: 10),
           TextFormField(
             controller: phonenumberController,
-            decoration: InputDecoration(labelText: 'Phone Number'),
+            decoration: InputDecoration(
+              labelText: 'Phone Number',
+              border: OutlineInputBorder(),
+            ),
             validator: (value) {
               if (value?.isEmpty ?? true) {
                 return 'Please enter your phone number';
@@ -100,9 +133,13 @@ class _RequestFormState extends State<RequestForm> {
               return null;
             },
           ),
+          SizedBox(height: 10),
           TextFormField(
             controller: tagController,
-            decoration: InputDecoration(labelText: 'Tag'),
+            decoration: InputDecoration(
+              labelText: 'Tag',
+              border: OutlineInputBorder(),
+            ),
             validator: (value) {
               if (value?.isEmpty ?? true) {
                 return 'Please enter a tag';
@@ -110,6 +147,7 @@ class _RequestFormState extends State<RequestForm> {
               return null;
             },
           ),
+          SizedBox(height: 10),
           Row(
             children: <Widget>[
               Checkbox(
@@ -123,6 +161,7 @@ class _RequestFormState extends State<RequestForm> {
               Text('Show in Profile'),
             ],
           ),
+          SizedBox(height: 20),
           ElevatedButton(
             onPressed: () async {
               if (_formKey.currentState?.validate() ?? false) {
@@ -135,11 +174,17 @@ class _RequestFormState extends State<RequestForm> {
                   "rtag": tagController.text,
                 };
 
-                // Pass _isChecked as a boolean to the API call
-                Api.addrequesterdata(data, _isChecked);
+                // Pass _isChecked as a boolean and _currentUserName as a string to the API call
+                Api.addrequesterdata(data, _isChecked, _currentUserName);
               }
             },
-            child: Text('Submit'),
+            child: Text(
+              'Submit',
+              style: TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),

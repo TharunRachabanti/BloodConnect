@@ -13,47 +13,38 @@ class _RequestScreen1State extends State<RequestScreen1> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Blood Donors'),
-      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ElevatedButton(
-            onPressed: () {
-              _showFilterDialog(context);
-            },
-            child: Text('Filter'),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton(
+              onPressed: () {
+                _showFilterDialog(context);
+              },
+              child: Text('Filter', style: TextStyle(fontSize: 18)),
+            ),
           ),
           Expanded(
             child: StreamBuilder(
               stream: _getFilteredUsersStream(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
+                  return Center(child: Text('Error: ${snapshot.error}'));
                 }
 
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
+                  return Center(child: CircularProgressIndicator());
                 }
 
                 return ListView(
+                  padding:
+                      EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
                   children:
                       snapshot.data!.docs.map((DocumentSnapshot document) {
                     Map<String, dynamic> data =
                         document.data() as Map<String, dynamic>;
-                    return ListTile(
-                      title: Text(data['name']),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Age: ${data['age']}'),
-                          Text('Blood Group: ${data['bloodGroup']}'),
-                          Text('Address: ${data['address']}'),
-                          Text('Sex: ${data['sex']}'),
-                        ],
-                      ),
-                    );
+                    return CardItem(data: data);
                   }).toList(),
                 );
               },
@@ -84,7 +75,7 @@ class _RequestScreen1State extends State<RequestScreen1> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Filter Options'),
+          title: Text('Filter Options', style: TextStyle(fontSize: 20)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -96,6 +87,7 @@ class _RequestScreen1State extends State<RequestScreen1> {
                   });
                 },
               ),
+              SizedBox(height: 8),
               TextField(
                 decoration: InputDecoration(labelText: 'Location'),
                 onChanged: (value) {
@@ -111,17 +103,92 @@ class _RequestScreen1State extends State<RequestScreen1> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: Text('Cancel', style: TextStyle(fontSize: 18)),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Search'),
+              child: Text('Search', style: TextStyle(fontSize: 18)),
             ),
           ],
         );
       },
+    );
+  }
+}
+
+class CardItem extends StatefulWidget {
+  final Map<String, dynamic> data;
+
+  const CardItem({required this.data});
+
+  @override
+  _CardItemState createState() => _CardItemState();
+}
+
+class _CardItemState extends State<CardItem> {
+  bool isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            isExpanded = !isExpanded;
+          });
+        },
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    backgroundImage:
+                        NetworkImage(''), // Add the URL for the image
+                  ),
+                  SizedBox(width: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.data['name'] ?? '',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20),
+                      ),
+                      Text('Blood Group: ${widget.data['bloodGroup'] ?? ''}'),
+                    ],
+                  ),
+                  Spacer(),
+                  Icon(Icons.location_on, color: Colors.red, size: 20),
+                  SizedBox(width: 20),
+                  Icon(Icons.phone, color: Colors.green, size: 20),
+                ],
+              ),
+              if (isExpanded) ...[
+                SizedBox(height: 16),
+                Text(
+                  widget.data['address'] ?? '',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'Age: ${widget.data['age'] ?? ''}',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'Sex: ${widget.data['sex'] ?? ''}',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

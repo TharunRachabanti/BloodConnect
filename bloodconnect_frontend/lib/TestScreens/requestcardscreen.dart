@@ -2,13 +2,15 @@ import 'package:bloodconnect_frontend/models/requesterdata_model.dart';
 import 'package:bloodconnect_frontend/services/api.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class RequestCardScreen extends StatelessWidget {
+  const RequestCardScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("RequestCardScreen"),
+      ),
       body: FutureBuilder(
         future: Api.getrequestersdata(),
         builder: (BuildContext context,
@@ -40,6 +42,8 @@ class HomeScreen extends StatelessWidget {
                         Text('Tag: ${requesterData.tag ?? ''}'),
                         Text(
                             'Show in Profile: ${requesterData.showInProfile ?? ''}'),
+                        Text(
+                            'Timestamp: ${requesterData.createdAt != null ? requesterData.createdAt!.toIso8601String() : ''}'),
                       ],
                     ),
                   ),

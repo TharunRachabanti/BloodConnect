@@ -1,17 +1,18 @@
-import 'package:bloodconnect_frontend/models/requesterdata_model.dart';
 import 'package:bloodconnect_frontend/models/tweetimagemodel.dart';
 import 'package:bloodconnect_frontend/services/api.dart';
 import 'package:flutter/material.dart';
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({Key? key});
+class DonateTweetScreen extends StatelessWidget {
+  const DonateTweetScreen({Key? key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("DonateTweetScreen"),
+      ),
       body: FutureBuilder(
-        future: Api.getImageMessages(),
+        future: Api.getDonateImageMessages(),
         builder: (BuildContext context,
             AsyncSnapshot<List<TweetImageModel>> snapshot) {
           if (!snapshot.hasData) {
@@ -31,6 +32,8 @@ class ProfileScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('message: ${tweetImageModeldata.Message ?? ''}'),
+                        Text(
+                            'Timestamp: ${tweetImageModeldata.createdAt.toString()}'), // Display timestamp
                         Image.network(
                           tweetImageModeldata.Imageurl ?? '',
                           width: 200, // Adjust the width as needed

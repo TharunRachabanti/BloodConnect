@@ -1,9 +1,11 @@
 import 'package:bloodconnect_frontend/MainProfileScreen.dart';
 import 'package:bloodconnect_frontend/RequestScreens/requestscreen.dart';
 import 'package:bloodconnect_frontend/DonateScreens/donatescreen.dart';
-import 'package:bloodconnect_frontend/homescreen.dart';
+import 'package:bloodconnect_frontend/TestScreens/donatecardscreen.dart';
+import 'package:bloodconnect_frontend/TestScreens/donatetweetscreen.dart';
+import 'package:bloodconnect_frontend/TestScreens/requestcardscreen.dart';
 import 'package:bloodconnect_frontend/mainhome.dart';
-import 'package:bloodconnect_frontend/profilescreen.dart';
+import 'package:bloodconnect_frontend/TestScreens/requesttweetscreen.dart';
 import 'package:flutter/material.dart';
 
 class TabScreen extends StatefulWidget {
@@ -20,12 +22,10 @@ class _TabScreenState extends State<TabScreen> {
   void initState() {
     super.initState();
     _widgetOptions = <Widget>[
-      HomeScreen(),
+      MainHomeScreen(),
       DonateScreen(),
       RequestScreen(),
-      ProfileScreen(),
-      MainProfileScreen(),
-      MainHomeScreen(), // No parameters passed
+      MainProfileScreen(), // Make sure this widget fits your intention
     ];
   }
 
@@ -61,23 +61,9 @@ class _TabScreenState extends State<TabScreen> {
           BottomNavigationBarItem(
             icon: Icon(
               Icons.person,
-              color: Colors.black,
-            ),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.ac_unit_sharp,
-              color: Colors.black,
+              color: Colors.black, // Adjust color or icon as needed
             ),
             label: 'MProfile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.home,
-              color: Colors.black,
-            ),
-            label: 'Home',
           ),
         ],
         currentIndex: _selectedIndex,

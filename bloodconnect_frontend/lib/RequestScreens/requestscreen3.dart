@@ -1,5 +1,7 @@
 import 'dart:io';
+
 import 'package:bloodconnect_frontend/services/api.dart';
+import 'package:bloodconnect_frontend/services/currentuser.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
@@ -19,22 +21,24 @@ class _RequestScreen3State extends State<RequestScreen3> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Create Tweet'),
-      ),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(20.0),
+      body: Padding(
+        padding: EdgeInsets.all(20.0),
+        child: Form(
+          key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               TextFormField(
                 controller: _messageController,
                 maxLines: 5,
+                style: TextStyle(fontSize: 18.0),
                 decoration: InputDecoration(
                   labelText: 'Message',
                   border: OutlineInputBorder(),
+                  labelStyle: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -52,19 +56,26 @@ class _RequestScreen3State extends State<RequestScreen3> {
                   : SizedBox(),
               SizedBox(height: 20),
               _isLoading
-                  ? CircularProgressIndicator() // Show loading indicator if uploading
+                  ? CircularProgressIndicator()
                   : ElevatedButton(
                       onPressed: () async {
-                        // Call _uploadImageAndMessage function
                         await _uploadImageAndMessage();
-
-                        // If _uploadImageAndMessage was successful, call Api.uploadImageData
-                        if (!_isLoading) {
-                          Api.uploadImageData(
-                              imageUrl, _messageController.text);
-                        }
                       },
-                      child: Text('Submit'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: EdgeInsets.symmetric(
+                            vertical: 12.0, horizontal: 50.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                      ),
+                      child: Text(
+                        'Submit',
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
             ],
           ),
@@ -73,6 +84,7 @@ class _RequestScreen3State extends State<RequestScreen3> {
       floatingActionButton: FloatingActionButton(
         onPressed: _getImage,
         tooltip: 'Select Image',
+        backgroundColor: Colors.red,
         child: Icon(Icons.add_a_photo),
       ),
     );
@@ -96,10 +108,8 @@ class _RequestScreen3State extends State<RequestScreen3> {
       });
 
       try {
-        // Get message text
         final String message = _messageController.text;
 
-        // Upload image to Firebase Storage
         if (_image != null) {
           final Reference storageRef = FirebaseStorage.instance
               .ref()
@@ -107,38 +117,38 @@ class _RequestScreen3State extends State<RequestScreen3> {
 
           final UploadTask uploadTask = storageRef.putFile(_image!);
 
-          // Show upload progress using a progress indicator
           uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
             double progress = snapshot.bytesTransferred / snapshot.totalBytes;
             print('Upload progress: $progress');
           });
 
-          // Wait for the upload to complete
           final TaskSnapshot taskSnapshot = await uploadTask;
           imageUrl = await taskSnapshot.ref.getDownloadURL();
         }
 
-        // Now you can use imageUrl and message for further processing
-        print('Image URL: $imageUrl');
-        print('Message: $message');
+        // Get the current username
+        String currentUsername = await getCurrentUserNameFromFirestore();
+
+        // Send image URL, message, and username to the API
+        await Api.uploadImageData(imageUrl, message, currentUsername);
 
         setState(() {
           _isLoading = false;
         });
-
-        // Optionally, you can navigate to another screen or show a success message here
       } catch (e) {
         print('Error uploading image: $e');
         setState(() {
           _isLoading = false;
         });
 
-        // Handle error gracefully, show a snackbar or alert dialog
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Error uploading image. Please try again later.'),
+          content: Text(
+            'Error uploading image. Please try again later.',
+            style: TextStyle(fontSize: 16.0),
+          ),
           action: SnackBarAction(
             label: 'Retry',
-            onPressed: _uploadImageAndMessage, // Retry the upload
+            onPressed: _uploadImageAndMessage,
           ),
         ));
       }

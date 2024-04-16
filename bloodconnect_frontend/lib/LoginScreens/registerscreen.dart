@@ -2,7 +2,6 @@ import 'package:bloodconnect_frontend/tabscreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class RegisterScreen extends StatelessWidget {
   final User user;
@@ -20,11 +19,12 @@ class RegisterScreen extends StatelessWidget {
     Future<void> _registerUser() async {
       try {
         await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-          'name': _nameController.text.trim(),
+          'name': _nameController.text.trim(), // Ensure 'name' field is set
           'age': _ageController.text.trim() ?? '',
           'bloodGroup': _bloodGroupController.text.trim() ?? '',
           'address': _addressController.text.trim() ?? '',
           'sex': _sexController.text.trim() ?? '',
+          'timestamp': FieldValue.serverTimestamp(), // Add timestamp field
         });
         Navigator.pushReplacement(
           context,

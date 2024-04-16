@@ -1,208 +1,55 @@
+import 'dart:io';
+
+import 'package:bloodconnect_frontend/services/api.dart';
+import 'package:bloodconnect_frontend/services/currentuser.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
-class DonateScreen3 extends StatelessWidget {
+class DonateScreen3 extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Posters/Tweets'),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'On this screen, when a user selects the "Poster" option, they will be prompted to provide specific details. Subsequently, the system generates a pre-designed poster and posts it onto the home page. Below this functionality, if the user opts for the "Tweet" option, they will be prompted to input a message along with an image. Once the user clicks the "Tweet" button, the composed tweet will be displayed on the home screen.',
-          ),
-          SizedBox(height: 20), // Add some space between text and buttons
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  // Navigate to form for creating a poster
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => PosterForm()),
-                  );
-                },
-                child: Text('Post'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  // Navigate to form for creating a tweet
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => TweetForm()),
-                  );
-                },
-                child: Text('Tweet'),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+  _DonateScreen3State createState() => _DonateScreen3State();
 }
 
-class PosterForm extends StatefulWidget {
-  @override
-  _PosterFormState createState() => _PosterFormState();
-}
-
-class _PosterFormState extends State<PosterForm> {
-  final _formKey = GlobalKey<FormState>();
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _bloodGroupController = TextEditingController();
-  TextEditingController _ageController = TextEditingController();
-  TextEditingController _addressController = TextEditingController();
-  TextEditingController _genderController = TextEditingController();
-  TextEditingController _phoneNumberController = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Create Poster'),
-      ),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: 'Name',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Please enter your name';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 10),
-              TextFormField(
-                controller: _bloodGroupController,
-                decoration: InputDecoration(
-                  labelText: 'Blood Group',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Please enter your blood group';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 10),
-              TextFormField(
-                controller: _ageController,
-                decoration: InputDecoration(
-                  labelText: 'Age',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Please enter your age';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 10),
-              TextFormField(
-                controller: _addressController,
-                decoration: InputDecoration(
-                  labelText: 'Address',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Please enter your address';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 10),
-              TextFormField(
-                controller: _genderController,
-                decoration: InputDecoration(
-                  labelText: 'Gender',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Please enter your gender';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 10),
-              TextFormField(
-                controller: _phoneNumberController,
-                decoration: InputDecoration(
-                  labelText: 'Phone Number',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Please enter your phone number';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState?.validate() ?? false) {
-                      // Submit the form
-                      // You can access the form values using _nameController.text, _bloodGroupController.text, etc.
-                      // Implement your logic for submitting the form data here
-                    }
-                  },
-                  child: Text('Submit'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class TweetForm extends StatefulWidget {
-  @override
-  _TweetFormState createState() => _TweetFormState();
-}
-
-class _TweetFormState extends State<TweetForm> {
+class _DonateScreen3State extends State<DonateScreen3> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController _messageController = TextEditingController();
+  File? _image;
+  bool _isLoading = false;
+  String imageUrl = '';
+  late String _currentUserName; // Added
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCurrentUserName(); // Fetch current user's name when the screen initializes
+  }
+
+  void _fetchCurrentUserName() async {
+    // Fetch current user's name from Firebase Firestore
+    _currentUserName = await getCurrentUserNameFromFirestore();
+    setState(() {}); // Update the state to reflect the fetched user name
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create Tweet'),
+        title: Text('Create Donate Tweet'),
       ),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              TextFormField(
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Form(
+              key: _formKey,
+              child: TextFormField(
                 controller: _messageController,
                 maxLines: 5,
                 decoration: InputDecoration(
                   labelText: 'Message',
+                  hintText: 'Enter your message here',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
@@ -212,34 +59,128 @@ class _TweetFormState extends State<TweetForm> {
                   return null;
                 },
               ),
-              Padding(
-                padding: EdgeInsets.all(20.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Implement image selection from device storage
-                  },
-                  child: Text('Select Image'),
+            ),
+            SizedBox(height: 20),
+            GestureDetector(
+              onTap: _getImage,
+              child: Container(
+                width: double.infinity,
+                height: 150,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(10),
                 ),
+                child: _image != null
+                    ? Image.file(
+                        _image!,
+                        fit: BoxFit.cover,
+                      )
+                    : Center(
+                        child: Icon(
+                          Icons.add_a_photo,
+                          size: 50,
+                          color: Colors.grey,
+                        ),
+                      ),
               ),
-              SizedBox(height: 20),
-              // Add image picker widget here
-              SizedBox(height: 20),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // Submit the form
-                      // You can access the form values using _messageController.text for the message
-                      // Implement your logic for submitting the form data here
-                    }
-                  },
-                  child: Text('Submit'),
-                ),
-              ),
-            ],
-          ),
+            ),
+            SizedBox(height: 20),
+            _isLoading
+                ? Center(
+                    child:
+                        CircularProgressIndicator()) // Show loading indicator if uploading
+                : ElevatedButton(
+                    onPressed: () async {
+                      // Call _uploadImageAndMessage function
+                      await _uploadDonateImageAndMessage();
+                    },
+                    child: Text('Submit'),
+                  ),
+          ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _getImage,
+        tooltip: 'Select Image',
+        child: Icon(Icons.add_a_photo),
+      ),
     );
+  }
+
+  Future<void> _getImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> _uploadDonateImageAndMessage() async {
+    if (_currentUserName == null || _currentUserName.isEmpty) {
+      // Handle case where current user's name is not available
+      print('Current user name is not available');
+      return;
+    }
+
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        // Get message text
+        final String message = _messageController.text;
+
+        // Upload image to Firebase Storage
+        if (_image != null) {
+          final Reference storageRef = FirebaseStorage.instance
+              .ref()
+              .child('Donateimages/${DateTime.now().millisecondsSinceEpoch}');
+
+          final UploadTask uploadTask = storageRef.putFile(_image!);
+
+          // Show upload progress using a progress indicator
+          uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+            double progress = snapshot.bytesTransferred / snapshot.totalBytes;
+            print('Upload progress: $progress');
+          });
+
+          // Wait for the upload to complete
+          final TaskSnapshot taskSnapshot = await uploadTask;
+          imageUrl = await taskSnapshot.ref.getDownloadURL();
+
+          // Now you can use imageUrl and message for further processing
+          print('Image URL: $imageUrl');
+          print('Message: $message');
+
+          // Call API to upload image data
+          Api.uploadDonateImageData(
+              imageUrl, message, _currentUserName); // Pass the current username
+
+          // Optionally, you can navigate to another screen or show a success message here
+        }
+
+        setState(() {
+          _isLoading = false;
+        });
+      } catch (e) {
+        print('Error uploading image: $e');
+        setState(() {
+          _isLoading = false;
+        });
+
+        // Handle error gracefully, show a snackbar or alert dialog
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error uploading image. Please try again later.'),
+          action: SnackBarAction(
+            label: 'Retry',
+            onPressed: _uploadDonateImageAndMessage, // Retry the upload
+          ),
+        ));
+      }
+    }
   }
 }

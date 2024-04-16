@@ -52,17 +52,41 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
+        backgroundColor: Colors.redAccent,
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: ListView(
           children: [
-            Text('Name: $_userName'),
-            Text('Age: $_userAge'),
-            Text('Blood Group: $_userBloodGroup'),
-            Text('Address: $_userAddress'),
-            Text('Sex: $_userSex'),
+            CircleAvatar(
+              radius: 50,
+              backgroundImage: NetworkImage('https://via.placeholder.com/150'),
+            ),
+            SizedBox(height: 24),
+            Card(
+              elevation: 4,
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Name: $_userName',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 8),
+                    Text('Age: $_userAge', style: TextStyle(fontSize: 18)),
+                    SizedBox(height: 8),
+                    Text('Blood Group: $_userBloodGroup',
+                        style: TextStyle(fontSize: 18)),
+                    SizedBox(height: 8),
+                    Text('Address: $_userAddress',
+                        style: TextStyle(fontSize: 18)),
+                    SizedBox(height: 8),
+                    Text('Sex: $_userSex', style: TextStyle(fontSize: 18)),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
