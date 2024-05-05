@@ -8,17 +8,17 @@ class RequestScreen2 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(20.0),
+        padding: EdgeInsets.only(top: 20, left: 25, right: 25, bottom: 25),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              padding: const EdgeInsets.only(bottom: 10),
               child: Text(
                 'Submit your request to seek blood donation.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 18.0,
+                  fontSize: 12.0,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -64,88 +64,34 @@ class _RequestFormState extends State<RequestForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          TextFormField(
+          _buildStyledTextField(
             controller: nameController,
-            decoration: InputDecoration(
-              labelText: 'Name',
-              border: OutlineInputBorder(),
-            ),
-            validator: (value) {
-              if (value?.isEmpty ?? true) {
-                return 'Please enter your name';
-              }
-              return null;
-            },
+            labelText: 'Name',
           ),
           SizedBox(height: 10),
-          TextFormField(
+          _buildStyledTextField(
             controller: bloodgroupController,
-            decoration: InputDecoration(
-              labelText: 'Blood Group',
-              border: OutlineInputBorder(),
-            ),
-            validator: (value) {
-              if (value?.isEmpty ?? true) {
-                return 'Please enter your blood group';
-              }
-              return null;
-            },
+            labelText: 'Blood Group',
           ),
           SizedBox(height: 10),
-          TextFormField(
+          _buildStyledTextField(
             controller: genderController,
-            decoration: InputDecoration(
-              labelText: 'Gender',
-              border: OutlineInputBorder(),
-            ),
-            validator: (value) {
-              if (value?.isEmpty ?? true) {
-                return 'Please enter your gender';
-              }
-              return null;
-            },
+            labelText: 'Gender',
           ),
           SizedBox(height: 10),
-          TextFormField(
+          _buildStyledTextField(
             controller: addressController,
-            decoration: InputDecoration(
-              labelText: 'Address',
-              border: OutlineInputBorder(),
-            ),
-            validator: (value) {
-              if (value?.isEmpty ?? true) {
-                return 'Please enter your address';
-              }
-              return null;
-            },
+            labelText: 'Address',
           ),
           SizedBox(height: 10),
-          TextFormField(
+          _buildStyledTextField(
             controller: phonenumberController,
-            decoration: InputDecoration(
-              labelText: 'Phone Number',
-              border: OutlineInputBorder(),
-            ),
-            validator: (value) {
-              if (value?.isEmpty ?? true) {
-                return 'Please enter your phone number';
-              }
-              return null;
-            },
+            labelText: 'Phone Number',
           ),
           SizedBox(height: 10),
-          TextFormField(
+          _buildStyledTextField(
             controller: tagController,
-            decoration: InputDecoration(
-              labelText: 'Tag',
-              border: OutlineInputBorder(),
-            ),
-            validator: (value) {
-              if (value?.isEmpty ?? true) {
-                return 'Please enter a tag';
-              }
-              return null;
-            },
+            labelText: 'Tag',
           ),
           SizedBox(height: 10),
           Row(
@@ -158,7 +104,7 @@ class _RequestFormState extends State<RequestForm> {
                   });
                 },
               ),
-              Text('Show in Profile'),
+              Text('Show in Home'),
             ],
           ),
           SizedBox(height: 20),
@@ -183,11 +129,48 @@ class _RequestFormState extends State<RequestForm> {
               style: TextStyle(
                 fontSize: 18.0,
                 fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              padding: EdgeInsets.symmetric(vertical: 15.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildStyledTextField({
+    required TextEditingController controller,
+    required String labelText,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0),
+          borderSide: BorderSide(color: Colors.grey),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0),
+          borderSide: BorderSide(color: Colors.blue),
+        ),
+        filled: true,
+        fillColor: Colors.grey[200],
+        contentPadding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
+      ),
+      validator: (value) {
+        if (value?.isEmpty ?? true) {
+          return 'Please enter $labelText';
+        }
+        return null;
+      },
     );
   }
 }

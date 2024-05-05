@@ -20,4 +20,6 @@ class RequesterData {
     this.createdAt,
     this.username, // Add the username parameter to the constructor
   });
+
+  toMap() {}
 }

@@ -55,7 +55,7 @@ class RequestScreen extends StatelessWidget {
               children: [
                 const SizedBox(height: 5),
                 Container(
-                  height: 70,
+                  height: 55,
                   decoration: BoxDecoration(
                     color: Colors.red,
                     borderRadius: BorderRadius.circular(8),
@@ -64,7 +64,7 @@ class RequestScreen extends StatelessWidget {
                     unselectedLabelColor: Colors.white,
                     labelColor: Colors.black,
                     indicatorPadding: const EdgeInsets.symmetric(
-                        horizontal: 2, vertical: 5), // Adjust padding here
+                        horizontal: 0, vertical: 8), // Adjust padding here
                     indicator: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(5),
@@ -107,13 +107,15 @@ class _StyledTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Tab(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 1),
         alignment: Alignment.center,
         child: Text(
           text,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 10,
+          style: GoogleFonts.getFont(
+            'Mate SC', // Change 'Roboto' to the desired Google Font
+            fontSize: 16,
+            height: 0.9,
             fontWeight: FontWeight.bold,
           ),
         ),

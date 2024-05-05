@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:bloodconnect_frontend/services/api.dart';
 import 'package:bloodconnect_frontend/services/currentuser.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class RequestScreen3 extends StatefulWidget {
@@ -21,19 +21,28 @@ class _RequestScreen3State extends State<RequestScreen3> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
+      appBar: AppBar(
+          toolbarHeight: 40,
+          title: Center(
+            child: Text(
+              'Create Request Tweet',
+              style: TextStyle(fontSize: 15),
+            ),
+          )),
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(20.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              TextFormField(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Form(
+              key: _formKey,
+              child: TextFormField(
                 controller: _messageController,
                 maxLines: 5,
                 style: TextStyle(fontSize: 18.0),
                 decoration: InputDecoration(
                   labelText: 'Message',
+                  hintText: 'Enter your message here',
                   border: OutlineInputBorder(),
                   labelStyle: TextStyle(
                     fontSize: 20.0,
@@ -47,26 +56,51 @@ class _RequestScreen3State extends State<RequestScreen3> {
                   return null;
                 },
               ),
-              SizedBox(height: 20),
-              _image != null
-                  ? Image.file(
-                      _image!,
-                      height: 150,
-                    )
-                  : SizedBox(),
-              SizedBox(height: 20),
-              _isLoading
-                  ? CircularProgressIndicator()
-                  : ElevatedButton(
+            ),
+            SizedBox(height: 20),
+            GestureDetector(
+              onTap: _getImage,
+              child: Container(
+                width: double.infinity,
+                height: 150,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: _image != null
+                    ? Image.file(
+                        _image!,
+                        fit: BoxFit.cover,
+                      )
+                    : Center(
+                        child: Icon(
+                          Icons.add_a_photo,
+                          size: 50,
+                          color: Colors.grey,
+                        ),
+                      ),
+              ),
+            ),
+            SizedBox(height: 20),
+            _isLoading
+                ? Center(child: CircularProgressIndicator())
+                : SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
                       onPressed: () async {
                         await _uploadImageAndMessage();
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        padding: EdgeInsets.symmetric(
-                            vertical: 12.0, horizontal: 50.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.redAccent),
+                        shape: MaterialStateProperty.all<OutlinedBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                          EdgeInsets.symmetric(
+                              vertical: 12.0, horizontal: 50.0),
                         ),
                       ),
                       child: Text(
@@ -74,18 +108,13 @@ class _RequestScreen3State extends State<RequestScreen3> {
                         style: TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
                     ),
-            ],
-          ),
+                  ),
+          ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _getImage,
-        tooltip: 'Select Image',
-        backgroundColor: Colors.red,
-        child: Icon(Icons.add_a_photo),
       ),
     );
   }
@@ -126,10 +155,8 @@ class _RequestScreen3State extends State<RequestScreen3> {
           imageUrl = await taskSnapshot.ref.getDownloadURL();
         }
 
-        // Get the current username
         String currentUsername = await getCurrentUserNameFromFirestore();
 
-        // Send image URL, message, and username to the API
         await Api.uploadImageData(imageUrl, message, currentUsername);
 
         setState(() {
